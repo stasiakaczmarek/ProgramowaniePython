@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista zadań</title>
+</head>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<body>
+    <h1>Lista zadań</h1>
+    <form method="POST" action="{{ url_for('tasks_page') }}">
+        <input type="text" name="content" placeholder="Dodaj zadanie" required>
+        <input type="text" name="due_date" placeholder="DD-MM-YYYY" required pattern="\d{2}-\d{2}-\d{4}">
+        <button type="submit">Dodaj</button>
+    </form>
+
+
+    {% for date in dates %}
+    <h3>
+        {{ date }}
+        {% if tasks_by_date[date][0].is_overdue %}
+            (po terminie wykonania)
+        {% endif %}
+    </h3>
+    <ul>
+        {% for task in tasks_by_date[date] %}
+            <li>
+                {{ task.content }}
+                {% if task.done %}
+                    (wykonane)
+                {% endif %}
+                <a href="{{ url_for('mark_as_done', task_id=task.id) }}">✔️</a>
+                <a href="{{ url_for('delete_task', task_id=task.id) }}">❌</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+ <a href="{{ url_for('home') }}">Powrót do strony głównej</a>
+</body>
+</html>
